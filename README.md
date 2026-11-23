@@ -86,8 +86,10 @@ tg-expenses/
 4. Задайте секрет: **Edge Functions → api → Secrets** (или
    Project Settings → Edge Functions → Add new secret):
    - Name: `TELEGRAM_BOT_TOKEN`, Value: токен из шага 1.
-   - `SUPABASE_URL` и `SUPABASE_SERVICE_ROLE_KEY` Supabase подставляет
-     автоматически — их задавать НЕ нужно.
+   - `SUPABASE_URL` и ключи доступа к БД Supabase подставляет автоматически —
+     их задавать НЕ нужно. В новых проектах это `SUPABASE_SECRET_KEYS`
+     (ключ формата `sb_secret_...`), в старых — `SUPABASE_SERVICE_ROLE_KEY`;
+     функция понимает оба варианта.
 
 > Альтернатива через CLI (необязательно):
 > ```bash
@@ -213,6 +215,7 @@ Deploy). GitHub Pages — если репозиторий уже на GitHub и 
 | «Невалидная подпись Telegram…» | Неверный `TELEGRAM_BOT_TOKEN` в secrets (опечатка, токен другого бота, перевыпущенный токен). Проверьте секрет. Также бывает при открытии не через Telegram или устаревшей initData (>24 ч) — переоткройте приложение. |
 | «Доступ запрещён: ваш Telegram ID не в списке…» | ID не добавлен в `allowed_users`. SQL Editor: `insert into allowed_users values (ВАШ_ID, 'имя');` |
 | Приложение открылось, но «Ошибка сервера (500)» | Смотрите логи: Dashboard → Edge Functions → api → Logs. Частое: миграция не выполнена (нет таблиц) или не задан секрет. |
+| Ping возвращает `permission denied for table …` | Функция использует нерабочий ключ БД. В новых проектах Supabase legacy `SUPABASE_SERVICE_ROLE_KEY` не действует — нужна версия функции, читающая `SUPABASE_SECRET_KEYS` (уже в коде проекта). Задеплойте актуальный код. |
 | Первый запрос утром очень долгий / ошибка сети | Проект Supabase уснул. Откройте приложение повторно; проверьте, что keepalive-workflow включён и переменная `API_URL` задана. |
 | CORS-ошибка в консоли браузера | Функция отвечает с `Access-Control-Allow-Origin: *` — если ошибка есть, значит запрос вообще не дошёл до функции (неверный URL в `config.js`, проект уснул/приостановлен). |
 | Кнопка меню не открывает приложение | URL должен быть HTTPS и совпадать с задеплоенным. В BotFather проверьте Menu Button. На Desktop иногда нужен перезапуск клиента. |

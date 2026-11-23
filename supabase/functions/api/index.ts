@@ -10,7 +10,8 @@
 //
 // Secrets (Dashboard → Edge Functions → api → Secrets):
 //   TELEGRAM_BOT_TOKEN — токен бота от @BotFather (ОБЯЗАТЕЛЬНО задать).
-//   SUPABASE_URL и SUPABASE_SERVICE_ROLE_KEY Supabase подставляет сам.
+//   SUPABASE_URL и ключи доступа к БД (SUPABASE_SECRET_KEYS / legacy
+//   SUPABASE_SERVICE_ROLE_KEY) Supabase подставляет сам.
 //
 // Деплой: Dashboard → Edge Functions → Create function → имя `api`,
 // вставить этот код, ВЫКЛЮЧИТЬ «Verify JWT» (валидация у нас своя),
@@ -21,7 +22,26 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 const BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// Ключ service-доступа к БД.
+// В НОВЫХ проектах Supabase (с late 2025) legacy-ключ SUPABASE_SERVICE_ROLE_KEY
+// не действует — вместо него выдаётся SUPABASE_SECRET_KEYS:
+// JSON-словарь вида {"default": "sb_secret_..."}. Берём его первым,
+// legacy-ключ оставляем fallback для старых проектов.
+function resolveServiceKey(): string {
+  try {
+    const dict = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}");
+    let key = dict.default ?? Object.values(dict)[0];
+    if (key && typeof key === "object") key = (key as Record<string, string>).key ?? (key as Record<string, string>).value;
+    if (typeof key === "string" && key) { KEY_SOURCE = "secret_keys"; return key; }
+  } catch { /* нет нового ключа — пробуем legacy */ }
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (legacy) { KEY_SOURCE = "legacy"; return legacy; }
+  KEY_SOURCE = "none";
+  return "";
+}
+let KEY_SOURCE = "none";
+const SERVICE_KEY = resolveServiceKey();
 
 // Фиксированные категории — должны совпадать с constraint в SQL и app.js
 const CATEGORIES = ["Еда", "Транспорт", "Жильё", "Развлечения", "Здоровье", "Подарки", "Прочее"];
@@ -164,7 +184,16 @@ Deno.serve(async (req: Request) => {
     // Лёгкий запрос к БД, initData не требуется, данных не отдаёт.
     if (action === "ping") {
       const { error } = await db.from("allowed_users").select("telegram_id").limit(1);
-      return json({ ok: !error });
+      if (error) console.error("ping db error:", JSON.stringify(error));
+      // ВРЕМЕННАЯ диагностика (префикс ключа — это только его формат, не секрет)
+      return json({
+        ok: !error,
+        error: error?.message ?? null,
+        v: 3,
+        keySource: KEY_SOURCE,
+        keyPrefix: SERVICE_KEY.slice(0, 10),
+        secretKeysEnv: Deno.env.get("SUPABASE_SECRET_KEYS") ? "present" : "absent",
+      });
     }
 
     // 1. Валидация подписи initData — для всех остальных действий
