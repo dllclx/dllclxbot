@@ -4,5 +4,7 @@
 // (Dashboard → Project Settings → General → Reference ID,
 //  либо он виден в Project URL: https://YOUR_PROJECT_REF.supabase.co).
 window.APP_CONFIG = {
-  API_URL: "https://xankbdnbuehiewmrsamk.supabase.co/functions/v1/api",
+  // Функция в этом проекте задеплоена под именем dynamic-function
+  // (так её сохранил редактор Supabase Dashboard).
+  API_URL: "https://xankbdnbuehiewmrsamk.supabase.co/functions/v1/dynamic-function",
 };
