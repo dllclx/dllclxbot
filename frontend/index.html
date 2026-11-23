@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Наши траты</title>
+  <!-- Telegram WebApp SDK: даёт initData, тему, haptic и т.д. -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Экран загрузки / ошибки (например, открыли не через Telegram) -->
+  <div id="status" class="status">Загрузка…</div>
+
+  <!-- Основное приложение -->
+  <div id="app" hidden>
+    <header class="header">
+      <h1>Наши траты</h1>
+      <input type="month" id="monthPicker" aria-label="Месяц">
+    </header>
+
+    <!-- Бюджет месяца: потрачено / осталось / превышено -->
+    <section class="card" id="budgetCard"></section>
+
+    <!-- Итоги: всего + по каждому -->
+    <section class="card" id="summaryCard"></section>
+
+    <!-- Фильтр ленты: Все / Мои / Партнёра -->
+    <div class="tabs" id="scopeTabs" role="tablist">
+      <button class="tab active" data-scope="all">Все</button>
+      <button class="tab" data-scope="mine">Мои</button>
+      <button class="tab" data-scope="partner">Партнёра</button>
+    </div>
+
+    <!-- Разбивка по категориям (для выбранного фильтра) -->
+    <section class="card" id="categoryCard"></section>
+
+    <!-- Лента трат, сгруппирована по дням -->
+    <section id="expenseList"></section>
+
+    <div class="fab-wrap">
+      <button id="addBtn" class="btn-primary">＋ Добавить трату</button>
+    </div>
+  </div>
+
+  <!--.Bottom sheet: форма добавления/редактирования траты -->
+  <div id="overlay" class="overlay" hidden>
+    <form id="expenseForm" class="sheet">
+      <div class="sheet-handle"></div>
+      <h2 id="formTitle">Новая трата</h2>
+
+      <label class="field">
+        <span>Сумма, ₽</span>
+        <input id="fAmount" type="text" inputmode="decimal" placeholder="0" autocomplete="off" required>
+      </label>
+
+      <label class="field">
+        <span>Категория</span>
+        <select id="fCategory"></select>
+      </label>
+
+      <label class="field">
+        <span>Дата</span>
+        <input id="fDate" type="date" required>
+      </label>
+
+      <label class="field">
+        <span>Комментарий (необязательно)</span>
+        <input id="fComment" type="text" maxlength="500" placeholder="Например: продукты на неделю" autocomplete="off">
+      </label>
+
+      <div class="sheet-buttons">
+        <button type="submit" id="saveBtn" class="btn-primary">Сохранить</button>
+        <button type="button" id="deleteBtn" class="btn-danger" hidden>Удалить</button>
+        <button type="button" id="cancelBtn" class="btn-secondary">Отмена</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- config.js содержит публичный URL функции (не секреты!) -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

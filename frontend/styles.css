@@ -1,0 +1,282 @@
+/* ============================================================
+   Мобильная вёрстка + тема Telegram.
+   Переменные --bg, --card, --text... app.js заполняет из
+   Telegram.WebApp.themeParams. Ниже — fallback для светлой и
+   тёмной темы (если themeParams пуст, например при отладке).
+   ============================================================ */
+
+:root {
+  --bg: #f4f4f7;
+  --card: #ffffff;
+  --text: #1c1c1e;
+  --hint: #8e8e93;
+  --accent: #2481cc;
+  --accent-text: #ffffff;
+  --link: #2481cc;
+  --danger: #e53935;
+  --border: rgba(0, 0, 0, 0.07);
+}
+
+:root[data-scheme="dark"] {
+  --bg: #17212b;
+  --card: #232e3c;
+  --text: #f5f5f5;
+  --hint: #708499;
+  --accent: #5288c1;
+  --accent-text: #ffffff;
+  --link: #6ab3f3;
+  --danger: #ff6b6b;
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-scheme="light"]) {
+    --bg: #17212b;
+    --card: #232e3c;
+    --text: #f5f5f5;
+    --hint: #708499;
+    --accent: #5288c1;
+    --link: #6ab3f3;
+    --danger: #ff6b6b;
+    --border: rgba(255, 255, 255, 0.08);
+  }
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px 12px calc(90px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Статус / ошибки ---------- */
+.status {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--hint);
+}
+
+/* ---------- Шапка ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.header h1 { font-size: 20px; margin: 0; }
+
+input[type="month"] {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+/* ---------- Карточки ---------- */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.card-title { font-size: 13px; color: var(--hint); margin-bottom: 8px; }
+.hint { color: var(--hint); font-size: 13px; }
+
+/* ---------- Бюджет ---------- */
+.budget-empty, .budget-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.budget-head .card-title { margin-bottom: 0; }
+.budget-numbers { margin-top: 8px; display: flex; align-items: baseline; gap: 6px; }
+.budget-numbers b { font-size: 20px; }
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 10px 0 8px;
+}
+.progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+.progress-fill.over { background: var(--danger); }
+.budget-left { color: var(--hint); font-size: 14px; }
+.budget-over { color: var(--danger); font-size: 14px; font-weight: 600; }
+.budget-form { display: flex; gap: 8px; margin-top: 8px; }
+.budget-form input { flex: 1; min-width: 0; }
+
+/* ---------- Итоги ---------- */
+.sum-total { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+.sum-row { display: flex; gap: 24px; }
+.sum-row b { font-size: 16px; }
+
+/* ---------- Табы ---------- */
+.tabs {
+  display: flex;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+.tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 8px 4px;
+  border-radius: 9px;
+  font-size: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab.active { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+
+/* ---------- Категории ---------- */
+.cat-row {
+  display: grid;
+  grid-template-columns: minmax(110px, auto) 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 14px;
+}
+.cat-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cat-bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.cat-row b { white-space: nowrap; }
+
+/* ---------- Лента ---------- */
+.day-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--hint);
+  font-size: 13px;
+  padding: 6px 4px;
+}
+.day-card { padding: 4px 14px; }
+.expense {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.expense:last-child { border-bottom: 0; }
+.expense.editable { cursor: pointer; }
+.expense.editable:active { opacity: .6; }
+.expense-emoji { font-size: 22px; }
+.expense-main { flex: 1; min-width: 0; }
+.expense-cat { font-size: 15px; }
+.expense-comment {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.expense-amount { font-weight: 600; white-space: nowrap; }
+.badge {
+  font-size: 11px;
+  color: var(--hint);
+  background: var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.empty { text-align: center; padding: 32px 16px; }
+
+/* ---------- Кнопки ---------- */
+.btn-primary, .btn-secondary, .btn-danger {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-primary { background: var(--accent); color: var(--accent-text); }
+.btn-primary:disabled { opacity: .5; }
+.btn-secondary { background: var(--border); color: var(--text); }
+.btn-danger { background: transparent; color: var(--danger); }
+.btn-small { width: auto; padding: 9px 14px; font-size: 14px; }
+.btn-link {
+  border: 0;
+  background: none;
+  color: var(--link);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.fab-wrap {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--bg) 40%);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ---------- Bottom sheet ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.overlay[hidden] { display: none; }
+.sheet {
+  background: var(--card);
+  width: 100%;
+  max-width: 560px;
+  border-radius: 18px 18px 0 0;
+  padding: 8px 16px calc(16px + env(safe-area-inset-bottom));
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin: 4px auto 8px;
+}
+.sheet h2 { font-size: 18px; margin: 4px 0 12px; }
+
+.field { display: block; margin-bottom: 12px; }
+.field span { display: block; font-size: 13px; color: var(--hint); margin-bottom: 4px; }
+.field input, .field select, .budget-form input {
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px; /* 16px — чтобы iOS не зумил при фокусе */
+}
+#fAmount { font-size: 22px; font-weight: 600; }
+
+.sheet-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }

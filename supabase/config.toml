@@ -1,0 +1,8 @@
+# Конфигурация для Supabase CLI (если деплоите функцию через CLI).
+# При деплое через Dashboard просто выключите тумблер "Verify JWT".
+project_id = "tg-expenses"
+
+[functions.api]
+# Наша функция валидирует Telegram initData сама,
+# стандартная проверка Supabase JWT должна быть выключена.
+verify_jwt = false

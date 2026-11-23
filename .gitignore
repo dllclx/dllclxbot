@@ -1,0 +1,6 @@
+# Секреты не должны попасть в репозиторий
+.env
+.env.*
+*.local
+node_modules/
+.supabase/
